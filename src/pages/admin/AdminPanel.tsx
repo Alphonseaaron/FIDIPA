@@ -38,6 +38,7 @@ interface SiteConfig {
     instagram?: string;
     linkedin?: string;
   };
+  sections: Record<string, boolean>;
 }
 
 interface Section {
@@ -49,16 +50,26 @@ interface Section {
   sort_order: number;
 }
 
+interface TeamMember {
+  id: string;
+  name: string;
+  role: string;
+  photo_url?: string;
+  sort_order: number;
+}
+
 export default function AdminPanel() {
   const { isAuthenticated, isLoading, login, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
-  const [activeTab, setActiveTab] = useState<'blog' | 'projects' | 'programs' | 'site' | 'sections' | 'media'>('blog');
+  const [activeTab, setActiveTab] = useState<'blog' | 'projects' | 'programs' | 'site' | 'sections' | 'media' | 'team'>('blog');
   const [content, setContent] = useState<ContentItem[]>([]);
   const [siteConfig, setSiteConfig] = useState<SiteConfig | null>(null);
   const [sections, setSections] = useState<Section[]>([]);
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  const [boardMembers, setBoardMembers] = useState<TeamMember[]>([]);
   const [editingItem, setEditingItem] = useState<ContentItem | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [isMounted, setIsMounted] = useState(true);
@@ -107,6 +118,20 @@ export default function AdminPanel() {
             .select('*')
             .order('sort_order', { ascending: true });
           setSections(sections || []);
+          break;
+        case 'team':
+          const [staffResponse, boardResponse] = await Promise.all([
+            supabase
+              .from('team_members')
+              .select('*')
+              .order('sort_order', { ascending: true }),
+            supabase
+              .from('board_members')
+              .select('*')
+              .order('sort_order', { ascending: true })
+          ]);
+          setTeamMembers(staffResponse.data || []);
+          setBoardMembers(boardResponse.data || []);
           break;
         case 'site':
           const { data: siteConfig } = await supabase
@@ -195,6 +220,27 @@ export default function AdminPanel() {
     } catch (error) {
       console.error('Error saving content:', error);
       alert('Failed to save changes');
+    }
+  };
+
+  const handleUpdateSiteConfig = async (config: SiteConfig) => {
+    try {
+      const { error } = await supabase
+        .from('site_config')
+        .update({
+          ...config,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', config.id);
+
+      if (error) throw error;
+      
+      if (isMounted) {
+        setSiteConfig(config);
+      }
+    } catch (error) {
+      console.error('Error updating site config:', error);
+      alert('Failed to update site configuration');
     }
   };
 
@@ -316,6 +362,17 @@ export default function AdminPanel() {
                 <span>Programs</span>
               </button>
               <button
+                onClick={() => setActiveTab('team')}
+                className={`w-full flex items-center space-x-2 p-2 rounded ${
+                  activeTab === 'team'
+                    ? 'bg-primary text-white'
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-dark-accent'
+                }`}
+              >
+                <Users size={20} />
+                <span>Team Members</span>
+              </button>
+              <button
                 onClick={() => setActiveTab('sections')}
                 className={`w-full flex items-center space-x-2 p-2 rounded ${
                   activeTab === 'sections'
@@ -394,7 +451,105 @@ export default function AdminPanel() {
               </motion.div>
             ) : (
               <>
-                {activeTab !== 'site' && activeTab !== 'media' && (
+                {activeTab === 'team' && (
+                  <motion.div
+                    key="team-management"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="space-y-8"
+                  >
+                    <div>
+                      <h3 className="text-xl font-semibold mb-4">Staff Members</h3>
+                      <div className="grid gap-4">
+                        {teamMembers.map((member) => (
+                          <div
+                            key={member.id}
+                            className="bg-white dark:bg-dark-lighter p-4 rounded-lg flex items-center justify-between"
+                          >
+                            <div className="flex items-center space-x-4">
+                              {member.photo_url ? (
+                                <img
+                                  src={member.photo_url}
+                                  alt={member.name}
+                                  className="w-10 h-10 rounded-full object-cover"
+                                />
+                              ) : (
+                                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                                  <User size={20} className="text-primary" />
+                                </div>
+                              )}
+                              <div>
+                                <h4 className="font-medium">{member.name}</h4>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">{member.role}</p>
+                              </div>
+                            </div>
+                            <div className="flex space-x-2">
+                              <button
+                                onClick={() => handleEdit(member as any)}
+                                className="p-2 text-gray-600 dark:text-gray-400 hover:text-primary transition-colors"
+                              >
+                                <Edit size={20} />
+                              </button>
+                              <button
+                                onClick={() => handleDelete(member as any)}
+                                className="p-2 text-gray-600 dark:text-gray-400 hover:text-red-500 transition-colors"
+                              >
+                                <Trash2 size={20} />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <h3 className="text-xl font-semibold mb-4">Board Members</h3>
+                      <div className="grid gap-4">
+                        {boardMembers.map((member) => (
+                          <div
+                            key={member.id}
+                            className="bg-white dark:bg-dark-lighter p-4 rounded-lg flex items-center justify-between"
+                          >
+                            <div className="flex items-center space-x-4">
+                              {member.photo_url ? (
+                                <img
+                                  src={member.photo_url}
+                                  alt={member.name}
+                                  className="w-10 h-10 rounded-full object-cover"
+                                />
+                              ) : (
+                                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                                  <User size={20} className="text-primary" />
+                                </div>
+                              )}
+                              <div>
+                                <h4 className="font-medium">{member.name}</h4>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">{member.role}</p>
+                              </div>
+                            </div>
+                            <div className="flex space-x-2">
+                              <button
+                                onClick={() => handleEdit(member as any)}
+                                className="p-2 text-gray-600 dark:text-gray-400 hover:text-primary transition-colors"
+                              >
+                                <Edit size={20} />
+                              </button>
+                              <button
+                                onClick={() => handleDelete(member as any)}
+                                className="p-2 text-gray-600 dark:text-gray-400 hover:text-red-500 transition-colors"
+                              >
+                                <Trash2 size={20} />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+
+                {activeTab !== 'site' && activeTab !== 'media' && activeTab !== 'team' && (
                   <motion.div
                     key="content-list"
                     initial={{ opacity: 0 }}
@@ -497,56 +652,32 @@ export default function AdminPanel() {
                       <div>
                         <h3 className="text-lg font-medium mb-4">Section Visibility</h3>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                          {Object.entries(defaultSections).map(([section, defaultValue]) => {
-                            const [isVisible, setIsVisible] = useState(defaultValue);
-
-                            useEffect(() => {
-                              const fetchSectionVisibility = async () => {
-                                const { data } = await supabase
-                                  .from('site_config')
-                                  .select('sections')
-                                  .single();
-                                if (data) {
-                                  setIsVisible(data.sections[section]);
-                                }
-                              };
-                              fetchSectionVisibility();
-                            }, [section]);
-
-                            const toggleSection = async () => {
-                              const newValue = !isVisible;
-                              setIsVisible(newValue);
-                              
-                              await supabase
-                                .from('site_config')
-                                .update({
-                                  sections: {
-                                    ...defaultSections,
-                                    [section]: newValue
-                                  }
-                                })
-                                .eq('id', siteConfig.id);
-                            };
-
-                            return (
-                              <div key={section} className="flex items-center justify-between p-4 bg-light dark:bg-dark rounded-lg">
-                                <span className="text-gray-900 dark:text-white capitalize">{section}</span>
-                                <button
-                                  type="button"
-                                  onClick={toggleSection}
-                                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                                    isVisible ? 'bg-primary' : 'bg-gray-400'
+                          {Object.entries(defaultSections).map(([section, defaultValue]) => (
+                            <div key={section} className="flex items-center justify-between p-4 bg-light dark:bg-dark rounded-lg">
+                              <span className="text-gray-900 dark:text-white capitalize">{section}</span>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setSiteConfig({
+                                    ...siteConfig,
+                                    sections: {
+                                      ...siteConfig.sections,
+                                      [section]: !s iteConfig.sections[section]
+                                    }
+                                  });
+                                }}
+                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                                  siteConfig.sections[section] ? 'bg-primary' : 'bg-gray-400'
+                                }`}
+                              >
+                                <span
+                                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                    siteConfig.sections[section] ? 'translate-x-6' : 'translate-x-1'
                                   }`}
-                                >
-                                  <span
-                                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                                      isVisible ? 'translate-x-6' : 'translate-x-1'
-                                    }`}
-                                  />
-                                </button>
-                              </div>
-                            );
-                          })}
+                                />
+                              </button>
+                            </div>
+                          ))}
                         </div>
                       </div>
 
@@ -574,7 +705,8 @@ export default function AdminPanel() {
                       </div>
 
                       <button
-                        type="submit"
+                        type="button"
+                        onClick={() => handleUpdateSiteConfig(siteConfig)}
                         className="w-full bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded transition-colors"
                       >
                         Save Changes
@@ -594,13 +726,10 @@ export default function AdminPanel() {
                     <MediaUploader
                       onUploadComplete={(url) => {
                         console.log('Uploaded:', url);
+                        fetchContent();
                       }}
                       folder="media"
                     />
-                    
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                      {/* Media items would go here */}
-                    </div>
                   </motion.div>
                 )}
               </>

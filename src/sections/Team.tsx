@@ -1,70 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, User } from 'lucide-react';
+import { supabase } from '../lib/supabase';
+import type { Database } from '../lib/database.types';
 
-const staffMembers = [
-  {
-    name: "Ms Jayne A. I. Wasonga",
-    role: "Board Secretary and Chief Executive Officer"
-  },
-  {
-    name: "Ms Jesca Mitaya",
-    role: "Finance and Administration FAM Manager"
-  },
-  {
-    name: "Ms Linda Otieno",
-    role: "Project Lead (Volunteer)"
-  },
-  {
-    name: "Rev. Walter Ang'ienda",
-    role: "Program Officer Peace Project (Volunteer)"
-  },
-  {
-    name: "Phillip Noel",
-    role: "Volunteer, Soft Skills (Water and Sanitation)"
-  },
-  {
-    name: "Jackson Lesian",
-    role: "Office Assistant/Driver"
-  },
-  {
-    name: "Jamima Mtuli",
-    role: "Administer/Programs Assistant"
-  }
-];
+type TeamMember = Database['public']['Tables']['team_members']['Row'];
+type BoardMember = Database['public']['Tables']['board_members']['Row'];
 
-const boardMembers = [
-  {
-    name: "Mrs Rosemary Meyo",
-    role: "Chairperson"
-  },
-  {
-    name: "Dr. Josephine Munthali",
-    role: "Vice Chairperson"
-  },
-  {
-    name: "Ms Jayne A. Wasonga",
-    role: "Chief Executive Officer and Board Secretary"
-  },
-  {
-    name: "Sr. Mildred Mayeye",
-    role: "Treasurer"
-  },
-  {
-    name: "Dr. Rev. Simon Oriedo",
-    role: "Member"
-  },
-  {
-    name: "Mr. Samwel Otieno",
-    role: "Committee Member"
-  },
-  {
-    name: "Prof. Esther Mombo",
-    role: "Committee Member"
-  }
-];
-
-function TeamCarousel({ members }: { members: typeof staffMembers }) {
+function TeamCarousel({ members }: { members: (TeamMember | BoardMember)[] }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [itemsPerPage, setItemsPerPage] = useState(3);
@@ -119,7 +62,7 @@ function TeamCarousel({ members }: { members: typeof staffMembers }) {
         <div className="flex gap-6 overflow-hidden">
           {visibleMembers.map((member, index) => (
             <motion.div
-              key={member.name}
+              key={member.id}
               initial={{ opacity: 0, x: 100 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -100 }}
@@ -132,9 +75,17 @@ function TeamCarousel({ members }: { members: typeof staffMembers }) {
               }}
             >
               <div className="flex flex-col h-full items-center text-center">
-                <div className="w-16 h-16 mx-auto mb-4 bg-primary/10 rounded-full flex items-center justify-center">
-                  <User size={24} className="text-primary" />
-                </div>
+                {member.photo_url ? (
+                  <img 
+                    src={member.photo_url} 
+                    alt={member.name}
+                    className="w-16 h-16 rounded-full object-cover mb-4"
+                  />
+                ) : (
+                  <div className="w-16 h-16 mx-auto mb-4 bg-primary/10 rounded-full flex items-center justify-center">
+                    <User size={24} className="text-primary" />
+                  </div>
+                )}
                 <div className="flex-1 flex flex-col items-center w-full">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                     {member.name}
@@ -169,6 +120,87 @@ function TeamCarousel({ members }: { members: typeof staffMembers }) {
 }
 
 export default function Team() {
+  const [staffMembers, setStaffMembers] = useState<TeamMember[]>([]);
+  const [boardMembers, setBoardMembers] = useState<BoardMember[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchTeamMembers();
+
+    const teamChannel = supabase
+      .channel('team-changes')
+      .on('postgres_changes', 
+        { event: '*', schema: 'public', table: 'team_members' },
+        () => fetchTeamMembers()
+      )
+      .subscribe();
+
+    const boardChannel = supabase
+      .channel('board-changes')
+      .on('postgres_changes', 
+        { event: '*', schema: 'public', table: 'board_members' },
+        () => fetchTeamMembers()
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(teamChannel);
+      supabase.removeChannel(boardChannel);
+    };
+  }, []);
+
+  const fetchTeamMembers = async () => {
+    try {
+      const [staffResponse, boardResponse] = await Promise.all([
+        supabase
+          .from('team_members')
+          .select('*')
+          .order('sort_order', { ascending: true }),
+        supabase
+          .from('board_members')
+          .select('*')
+          .order('sort_order', { ascending: true })
+      ]);
+
+      if (staffResponse.error) throw staffResponse.error;
+      if (boardResponse.error) throw boardResponse.error;
+
+      setStaffMembers(staffResponse.data || []);
+      setBoardMembers(boardResponse.data || []);
+    } catch (error) {
+      console.error('Error fetching team members:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <section id="team" className="py-20 bg-light dark:bg-dark">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="animate-pulse space-y-16">
+            <div>
+              <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-8"></div>
+              <div className="grid md:grid-cols-3 gap-6">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="bg-white dark:bg-dark-lighter rounded-lg p-6 h-48"></div>
+                ))}
+              </div>
+            </div>
+            <div>
+              <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-8"></div>
+              <div className="grid md:grid-cols-3 gap-6">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="bg-white dark:bg-dark-lighter rounded-lg p-6 h-48"></div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section id="team" className="py-20 bg-light dark:bg-dark">
       <div className="max-w-7xl mx-auto px-4">
@@ -185,15 +217,19 @@ export default function Team() {
         </motion.div>
 
         <div className="space-y-16">
-          <div>
-            <h3 className="text-2xl font-bold mb-8 text-gray-900 dark:text-white">Staff Members</h3>
-            <TeamCarousel members={staffMembers} />
-          </div>
+          {staffMembers.length > 0 && (
+            <div>
+              <h3 className="text-2xl font-bold mb-8 text-gray-900 dark:text-white">Staff Members</h3>
+              <TeamCarousel members={staffMembers} />
+            </div>
+          )}
 
-          <div>
-            <h3 className="text-2xl font-bold mb-8 text-gray-900 dark:text-white">Board of Advisory</h3>
-            <TeamCarousel members={boardMembers} />
-          </div>
+          {boardMembers.length > 0 && (
+            <div>
+              <h3 className="text-2xl font-bold mb-8 text-gray-900 dark:text-white">Board of Advisory</h3>
+              <TeamCarousel members={boardMembers} />
+            </div>
+          )}
         </div>
       </div>
     </section>

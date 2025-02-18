@@ -196,6 +196,64 @@ export interface Database {
           updated_at?: string
         }
       }
+      team_members: {
+        Row: {
+          id: string
+          name: string
+          role: string
+          photo_url: string | null
+          sort_order: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          role: string
+          photo_url?: string | null
+          sort_order?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          role?: string
+          photo_url?: string | null
+          sort_order?: number
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      board_members: {
+        Row: {
+          id: string
+          name: string
+          role: string
+          photo_url: string | null
+          sort_order: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          role: string
+          photo_url?: string | null
+          sort_order?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          role?: string
+          photo_url?: string | null
+          sort_order?: number
+          created_at?: string
+          updated_at?: string
+        }
+      }
     }
   }
 }
