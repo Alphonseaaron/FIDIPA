@@ -4,15 +4,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../hooks/useTheme';
 import { supabase } from '../lib/supabase';
 
-interface SiteConfig {
-  sections: Record<string, boolean>;
-}
-
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
   const { theme, toggleTheme } = useTheme();
-  const [visibleSections, setVisibleSections] = useState<Record<string, boolean>>({
+  const [visibleSections, setVisibleSections] = useState({
     home: true,
     about: true,
     programs: true,
@@ -23,24 +19,28 @@ export default function Navbar() {
   });
 
   useEffect(() => {
+    const fetchSiteConfig = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('site_config')
+          .select('sections')
+          .single();
+        
+        if (error) {
+          console.error('Error fetching site config:', error);
+          return; // Keep default values if there's an error
+        }
+        
+        if (data?.sections) {
+          setVisibleSections(data.sections);
+        }
+      } catch (error) {
+        console.error('Error in fetchSiteConfig:', error);
+      }
+    };
+
     fetchSiteConfig();
   }, []);
-
-  const fetchSiteConfig = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('site_config')
-        .select('sections')
-        .single();
-
-      if (error) throw error;
-      if (data) {
-        setVisibleSections(data.sections);
-      }
-    } catch (error) {
-      console.error('Error fetching site config:', error);
-    }
-  };
 
   const menuItems = [
     { title: 'Home', id: 'home' },

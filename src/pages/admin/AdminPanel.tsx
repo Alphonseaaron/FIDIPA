@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Settings, FileImage, Layout, BookOpen, Target, Users, Plus, Trash2, Edit, Eye, LogOut, Sun, Moon } from 'lucide-react';
+import { Settings, FileImage, Layout, BookOpen, Target, Users, Plus, Trash2, Edit, Eye, LogOut, Sun, Moon, User } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useTheme } from '../../hooks/useTheme';
 import ContentForm from '../../components/admin/ContentForm';
@@ -662,7 +662,7 @@ export default function AdminPanel() {
                                     ...siteConfig,
                                     sections: {
                                       ...siteConfig.sections,
-                                      [section]: !s iteConfig.sections[section]
+                                      [section]: !siteConfig.sections[section]
                                     }
                                   });
                                 }}

@@ -21,13 +21,22 @@ export default function Home() {
 
   useEffect(() => {
     const fetchSiteConfig = async () => {
-      const { data } = await supabase
-        .from('site_config')
-        .select('sections')
-        .single();
-      
-      if (data?.sections) {
-        setVisibleSections(data.sections);
+      try {
+        const { data, error } = await supabase
+          .from('site_config')
+          .select('sections')
+          .single();
+        
+        if (error) {
+          console.error('Error fetching site config:', error);
+          return; // Keep default values if there's an error
+        }
+        
+        if (data?.sections) {
+          setVisibleSections(data.sections);
+        }
+      } catch (error) {
+        console.error('Error in fetchSiteConfig:', error);
       }
     };
 
