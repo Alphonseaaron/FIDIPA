@@ -1,0 +1,55 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Helper function to check if user is admin
+    function isAdmin() {
+      return request.auth != null 
+        && request.auth.token.email == 'admin@fidipa.org';
+    }
+
+    // Allow public read access to all files
+    match /{allPaths=**} {
+      allow read: if true;
+    }
+    
+    // Allow write access only to authenticated users with size and type restrictions
+    match /uploads/{fileName} {
+      allow write: if request.auth != null 
+        && request.resource.size < 5 * 1024 * 1024 // 5MB max
+        && request.resource.contentType.matches('image/.*');
+    }
+    
+    // Blog post images
+    match /blog/{fileName} {
+      allow write: if isAdmin()
+        && request.resource.size < 10 * 1024 * 1024 // 10MB max
+        && request.resource.contentType.matches('image/.*');
+    }
+    
+    // Project images
+    match /projects/{fileName} {
+      allow write: if isAdmin()
+        && request.resource.size < 10 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+    
+    // Program images
+    match /programs/{fileName} {
+      allow write: if isAdmin()
+        && request.resource.size < 10 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+    
+    // Site assets (logo, favicon, etc.)
+    match /site/{fileName} {
+      allow write: if isAdmin()
+        && request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+    
+    // Allow admin users to delete files
+    match /{allPaths=**} {
+      allow delete: if isAdmin();
+    }
+  }
+}

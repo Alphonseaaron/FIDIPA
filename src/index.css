@@ -1,0 +1,70 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.ql-editor {
+  min-height: 200px;
+  @apply text-gray-800 dark:text-white;
+}
+
+.ql-toolbar {
+  @apply border-gray-200 dark:border-gray-600 border-b bg-gray-50 dark:bg-dark-lighter;
+}
+
+.ql-toolbar button {
+  @apply text-gray-700 dark:text-white;
+}
+
+.ql-toolbar button:hover {
+  @apply text-primary;
+}
+
+.ql-formats {
+  @apply border-r border-gray-200 dark:border-gray-600 pr-2 mr-2;
+}
+
+.prose {
+  @apply text-gray-600 dark:text-gray-300;
+}
+
+.prose h1, .prose h2, .prose h3, .prose h4 {
+  @apply text-gray-900 dark:text-white;
+}
+
+.prose a {
+  @apply text-primary;
+}
+
+.prose strong {
+  @apply text-gray-900 dark:text-white;
+}
+
+/* Light mode scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400;
+}
+
+/* Dark mode scrollbar */
+.dark ::-webkit-scrollbar-track {
+  @apply bg-dark-lighter;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  @apply bg-dark-accent;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-600;
+}

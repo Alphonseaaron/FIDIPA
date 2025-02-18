@@ -1,0 +1,198 @@
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
+
+export interface Database {
+  public: {
+    Tables: {
+      blog_posts: {
+        Row: {
+          id: string
+          title: string
+          slug: string
+          content: string | null
+          image_url: string | null
+          author: string | null
+          author_photo: string | null
+          author_bio: string | null
+          status: string | null
+          meta_title: string | null
+          meta_description: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          title: string
+          slug: string
+          content?: string | null
+          image_url?: string | null
+          author?: string | null
+          author_photo?: string | null
+          author_bio?: string | null
+          status?: string | null
+          meta_title?: string | null
+          meta_description?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          title?: string
+          slug?: string
+          content?: string | null
+          image_url?: string | null
+          author?: string | null
+          author_photo?: string | null
+          author_bio?: string | null
+          status?: string | null
+          meta_title?: string | null
+          meta_description?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      programs: {
+        Row: {
+          id: string
+          title: string
+          slug: string
+          description: string | null
+          content: string | null
+          image_url: string | null
+          meta_title: string | null
+          meta_description: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          title: string
+          slug: string
+          description?: string | null
+          content?: string | null
+          image_url?: string | null
+          meta_title?: string | null
+          meta_description?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          title?: string
+          slug?: string
+          description?: string | null
+          content?: string | null
+          image_url?: string | null
+          meta_title?: string | null
+          meta_description?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      projects: {
+        Row: {
+          id: string
+          title: string
+          slug: string
+          description: string | null
+          content: string | null
+          image_url: string | null
+          status: string | null
+          meta_title: string | null
+          meta_description: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          title: string
+          slug: string
+          description?: string | null
+          content?: string | null
+          image_url?: string | null
+          status?: string | null
+          meta_title?: string | null
+          meta_description?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          title?: string
+          slug?: string
+          description?: string | null
+          content?: string | null
+          image_url?: string | null
+          status?: string | null
+          meta_title?: string | null
+          meta_description?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      sections: {
+        Row: {
+          id: string
+          title: string
+          content: string | null
+          image_url: string | null
+          order: number | null
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          title: string
+          content?: string | null
+          image_url?: string | null
+          order?: number | null
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          title?: string
+          content?: string | null
+          image_url?: string | null
+          order?: number | null
+          updated_at?: string
+        }
+      }
+      site_config: {
+        Row: {
+          id: string
+          name: string
+          meta_title: string | null
+          meta_description: string | null
+          logo_url: string | null
+          favicon_url: string | null
+          social_links: Json
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          meta_title?: string | null
+          meta_description?: string | null
+          logo_url?: string | null
+          favicon_url?: string | null
+          social_links?: Json
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          meta_title?: string | null
+          meta_description?: string | null
+          logo_url?: string | null
+          favicon_url?: string | null
+          social_links?: Json
+          updated_at?: string
+        }
+      }
+    }
+  }
+}
