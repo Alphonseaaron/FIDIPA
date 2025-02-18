@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -11,12 +11,12 @@ import ProgramsPage from './pages/Programs';
 import BlogPostPage from './pages/BlogPost';
 import ProgramDetailPage from './pages/ProgramDetail';
 import ProjectDetailPage from './pages/ProjectDetail';
+import ThemeToggle from './components/ThemeToggle';
 
-// Scroll to top component
 function ScrollToTop() {
   const { pathname } = useLocation();
 
-  useEffect(() => {
+  React.useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);
 
@@ -25,12 +25,11 @@ function ScrollToTop() {
 
 function AppContent() {
   const location = useLocation();
-  const showNavbar = location.pathname === '/';
-  const isAdmin = location.pathname === '/admin';
+  const isAdmin = location.pathname.startsWith('/admin');
 
   return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-dark text-dark dark:text-white">
-      {showNavbar && <Navbar />}
+      {!isAdmin && <Navbar />}
       <div className="flex-1">
         <Routes>
           <Route path="/" element={<HomePage />} />
@@ -41,10 +40,15 @@ function AppContent() {
           <Route path="/programs" element={<ProgramsPage />} />
           <Route path="/programs/:slug" element={<ProgramDetailPage />} />
           <Route path="/write-for-us" element={<WriteForUsPage />} />
-          <Route path="/admin" element={<AdminPanel />} />
+          <Route path="/admin/*" element={<AdminPanel />} />
         </Routes>
       </div>
-      {!isAdmin && <Footer />}
+      {!isAdmin && (
+        <>
+          <Footer />
+          <ThemeToggle />
+        </>
+      )}
     </div>
   );
 }
