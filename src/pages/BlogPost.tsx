@@ -6,6 +6,8 @@ import BackButton from '../components/BackButton';
 const blogPosts = {
   'empowering-communities-through-sustainable-development': {
     title: "Empowering Communities Through Sustainable Development",
+    description: "Our sustainable development initiatives are transforming rural communities...",
+    imageUrl: "/image/DSC05379.JPG",
     content: `Our sustainable development initiatives are transforming rural communities through innovative approaches to poverty alleviation, environmental conservation, and economic empowerment. By implementing participatory development strategies and building local capacity, we're creating lasting positive change that benefits entire communities.
 
     Program Components:

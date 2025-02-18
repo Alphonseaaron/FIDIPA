@@ -6,7 +6,7 @@ const programs = [
   {
     title: "Gender Equality and Social Inclusion",
     description: "Empowering communities to address gender inequality and social inclusion through training community paralegals, youth, and women as community resource persons.",
-    image: "/src/assets/images/DSC05379.JPG",
+    image: "/image/DSC05379.JPG",
     subPrograms: [
       "Women with Disability (WWD)",
       "Women in and out of prisons",
@@ -18,7 +18,7 @@ const programs = [
   {
     title: "Grandmothers and Orphans Support",
     description: "Supporting grandmothers caring for orphans and vulnerable children (OVC) through health, nutrition, and economic empowerment initiatives.",
-    image: "/src/assets/images/SAM_1418.JPG",
+    image: "/image/SAM_1418.JPG",
     subPrograms: [
       "Health Support",
       "Nutrition Programs",
@@ -29,7 +29,7 @@ const programs = [
   {
     title: "Environment and Food Security",
     description: "Implementing sustainable farming methods and conservation agriculture to increase yields and promote drought-resistant crops.",
-    image: "/src/assets/images/kamulu dalawa 028.jpg",
+    image: "/image/kamulu dalawa 028.jpg",
     subPrograms: [
       "Sustainable Land Management",
       "Income Generation",

@@ -7,7 +7,7 @@ const projects = {
   'community-training-initiative': {
     title: "Community Training Initiative",
     description: "Implementing comprehensive training programs and workshops to build capacity within communities.",
-    imageUrl: "/src/assets/images/DSC01363.JPG",
+    imageUrl: "/image/DSC01363.JPG",
     status: "Ongoing",
     timeline: {
       start: "January 2024",
@@ -35,7 +35,7 @@ const projects = {
   'youth-development-program': {
     title: "Youth Development Program",
     description: "Supporting youth through education and outdoor activities to build life skills and community engagement.",
-    imageUrl: "/src/assets/images/SAM_0721.JPG",
+    imageUrl: "/image/SAM_0721.JPG",
     status: "Ongoing",
     timeline: {
       start: "March 2024",
@@ -63,7 +63,7 @@ const projects = {
   'school-infrastructure-support': {
     title: "School Infrastructure Support",
     description: "Improving school facilities and infrastructure to enhance the learning environment for students.",
-    imageUrl: "/src/assets/images/SAM_0724.JPG",
+    imageUrl: "/image/SAM_0724.JPG",
     status: "Ongoing",
     timeline: {
       start: "February 2024",
@@ -91,7 +91,7 @@ const projects = {
   'water-access-program': {
     title: "Water Access Program",
     description: "Improving access to clean water through infrastructure development and community management.",
-    imageUrl: "/src/assets/images/SAM_1409.JPG",
+    imageUrl: "/image/SAM_1409.JPG",
     status: "Ongoing",
     timeline: {
       start: "April 2024",
@@ -119,7 +119,7 @@ const projects = {
   'agricultural-skills-development': {
     title: "Agricultural Skills Development",
     description: "Training students and community members in sustainable agricultural practices.",
-    imageUrl: "/src/assets/images/kamulu dalawa 028.jpg",
+    imageUrl: "/image/kamulu dalawa 028.jpg",
     status: "Ongoing",
     timeline: {
       start: "May 2024",

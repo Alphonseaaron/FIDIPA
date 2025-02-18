@@ -6,24 +6,24 @@ import BackButton from '../components/BackButton';
 const blogPosts = [
   {
     title: "Empowering Communities Through Sustainable Development",
-    content: "Our sustainable development initiatives are transforming rural communities through innovative approaches to poverty alleviation, environmental conservation, and economic empowerment. By implementing participatory development strategies and building local capacity, we're creating lasting positive change that benefits entire communities. Our programs focus on sustainable agriculture, renewable energy, and community-led development projects that ensure long-term success and self-sufficiency.",
+    content: "Our sustainable development initiatives are transforming rural communities through innovative approaches to poverty alleviation, environmental conservation, and economic empowerment...",
     author: "Jayne Wasonga",
     date: "2024-02-15",
-    imageUrl: "/site/images/DSC05379.JPG"
+    imageUrl: "/image/DSC05379.JPG"
   },
   {
     title: "The Impact of Gender Equality Programs",
-    content: "Our gender equality initiatives have shown remarkable success in transforming communities and individual lives. Through targeted programs focusing on women's economic empowerment, leadership development, and access to education, we're breaking down traditional barriers and creating new opportunities. The programs have led to increased women's participation in community decision-making, improved economic outcomes, and stronger, more equitable communities.",
+    content: "Our gender equality initiatives have shown remarkable success in transforming communities and individual lives...",
     author: "Jayne Wasonga",
     date: "2024-02-10",
-    imageUrl: "/site/images/SAM_0790.JPG"
+    imageUrl: "/image/SAM_0790.JPG"
   },
   {
     title: "Innovation in Rural Healthcare Delivery",
-    content: "We're revolutionizing healthcare delivery in remote and underserved areas through innovative approaches and community partnerships. By combining mobile health clinics, telemedicine solutions, and community health worker training, we're bringing essential medical services to previously unreached populations. Our integrated approach ensures sustainable healthcare access while building local capacity for long-term health management.",
+    content: "We're revolutionizing healthcare delivery in remote and underserved areas through innovative approaches and community partnerships...",
     author: "Jayne Wasonga",
     date: "2024-02-05",
-    imageUrl: "/site/images/IMG_20141007_172002.jpg"
+    imageUrl: "/image/IMG_20141007_172002.jpg"
   }
 ];
 
