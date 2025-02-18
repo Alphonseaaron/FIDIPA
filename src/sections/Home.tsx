@@ -15,6 +15,21 @@ export default function Home() {
 
   useEffect(() => {
     fetchSections();
+
+    // Set up real-time subscription
+    const channel = supabase
+      .channel('sections-changes')
+      .on('postgres_changes', 
+        { event: '*', schema: 'public', table: 'sections' },
+        () => {
+          fetchSections();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   useEffect(() => {

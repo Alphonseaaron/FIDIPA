@@ -80,7 +80,11 @@ export async function getBlogPost(slug: string) {
 export async function createBlogPost(post: any) {
   const { data, error } = await supabase
     .from('blog_posts')
-    .insert([post])
+    .insert([{
+      ...post,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    }])
     .select()
     .single();
 
@@ -91,7 +95,10 @@ export async function createBlogPost(post: any) {
 export async function updateBlogPost(id: string, post: any) {
   const { data, error } = await supabase
     .from('blog_posts')
-    .update(post)
+    .update({
+      ...post,
+      updated_at: new Date().toISOString()
+    })
     .eq('id', id)
     .select()
     .single();
@@ -167,7 +174,10 @@ export async function getSections() {
 export async function updateSection(id: string, section: any) {
   const { data, error } = await supabase
     .from('sections')
-    .update(section)
+    .update({
+      ...section,
+      updated_at: new Date().toISOString()
+    })
     .eq('id', id)
     .select()
     .single();
@@ -190,7 +200,10 @@ export async function getSiteConfig() {
 export async function updateSiteConfig(config: any) {
   const { data, error } = await supabase
     .from('site_config')
-    .update(config)
+    .update({
+      ...config,
+      updated_at: new Date().toISOString()
+    })
     .eq('id', config.id)
     .select()
     .single();

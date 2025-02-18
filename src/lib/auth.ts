@@ -1,14 +1,6 @@
 import { useState, useEffect } from 'react';
-import { 
-  getAuth, 
-  signInWithEmailAndPassword, 
-  signOut, 
-  onAuthStateChanged, 
-  User 
-} from 'firebase/auth';
-import app from './firebase';
-
-const auth = getAuth(app);
+import { User } from '@supabase/supabase-js';
+import { supabase } from './supabase';
 
 interface AuthState {
   isAuthenticated: boolean;
@@ -26,22 +18,59 @@ export function useAuth() {
   });
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setAuthState({
-        isAuthenticated: !!user && user.email === 'admin@fidipa.org',
-        isLoading: false,
-        error: null,
-        user
-      });
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        setAuthState({
+          isAuthenticated: session.user.email === 'admin@fidipa.org',
+          isLoading: false,
+          error: null,
+          user: session.user
+        });
+      } else {
+        setAuthState({
+          isAuthenticated: false,
+          isLoading: false,
+          error: null,
+          user: null
+        });
+      }
     });
 
-    return () => unsubscribe();
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session) {
+        setAuthState({
+          isAuthenticated: session.user.email === 'admin@fidipa.org',
+          isLoading: false,
+          error: null,
+          user: session.user
+        });
+      } else {
+        setAuthState({
+          isAuthenticated: false,
+          isLoading: false,
+          error: null,
+          user: null
+        });
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   const login = async (email: string, password: string) => {
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      return true;
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) throw error;
+
+      return data.user.email === 'admin@fidipa.org';
     } catch (error) {
       setAuthState(prev => ({
         ...prev,
@@ -53,7 +82,7 @@ export function useAuth() {
 
   const logout = async () => {
     try {
-      await signOut(auth);
+      await supabase.auth.signOut();
     } catch (error) {
       console.error('Error signing out:', error);
     }

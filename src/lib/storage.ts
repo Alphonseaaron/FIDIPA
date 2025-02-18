@@ -1,5 +1,4 @@
-import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
-import { storage } from './firebase';
+import { supabase } from './supabase';
 import { nanoid } from 'nanoid';
 
 interface UploadResponse {
@@ -12,10 +11,16 @@ export async function uploadFile(file: File, folder: string = 'uploads'): Promis
     const fileExtension = file.name.split('.').pop();
     const uniqueFilename = `${nanoid()}.${fileExtension}`;
     const path = `${folder}/${uniqueFilename}`;
-    const storageRef = ref(storage, path);
     
-    await uploadBytes(storageRef, file);
-    const url = await getDownloadURL(storageRef);
+    const { error: uploadError } = await supabase.storage
+      .from('media')
+      .upload(path, file);
+
+    if (uploadError) throw uploadError;
+
+    const { data: { publicUrl: url } } = supabase.storage
+      .from('media')
+      .getPublicUrl(path);
     
     return {
       url,
@@ -29,8 +34,11 @@ export async function uploadFile(file: File, folder: string = 'uploads'): Promis
 
 export async function deleteFile(path: string): Promise<void> {
   try {
-    const fileRef = ref(storage, path);
-    await deleteObject(fileRef);
+    const { error } = await supabase.storage
+      .from('media')
+      .remove([path]);
+
+    if (error) throw error;
   } catch (error) {
     console.error('Error deleting file:', error);
     throw error;

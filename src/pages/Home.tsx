@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { doc, onSnapshot } from 'firebase/firestore';
-import { db } from '../lib/firebase';
+import { supabase } from '../lib/supabase';
 import About from '../sections/About';
 import Programs from '../sections/Programs';
 import Projects from '../sections/Projects';
@@ -21,13 +20,18 @@ export default function Home() {
   });
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(doc(db, 'site_config', 'sections'), (doc) => {
-      if (doc.exists()) {
-        setVisibleSections(doc.data() as Record<string, boolean>);
+    const fetchSiteConfig = async () => {
+      const { data } = await supabase
+        .from('site_config')
+        .select('sections')
+        .single();
+      
+      if (data?.sections) {
+        setVisibleSections(data.sections);
       }
-    });
+    };
 
-    return () => unsubscribe();
+    fetchSiteConfig();
   }, []);
 
   return (
