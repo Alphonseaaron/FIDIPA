@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { User } from '@supabase/supabase-js';
-import { supabase } from '../lib/supabase';
+import { supabase, signIn, signOut } from '../lib/supabase';
 
 interface AuthState {
   isAuthenticated: boolean;
@@ -61,16 +61,10 @@ export function useAuth() {
     };
   }, []);
 
-  const login = async (email: string, password: string) => {
+  const login = async () => {
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
-
-      if (error) throw error;
-
-      return data.user.email === 'admin@fidipa.org';
+      const { data } = await signIn();
+      return data?.user?.email === 'admin@fidipa.org';
     } catch (error) {
       setAuthState(prev => ({
         ...prev,
@@ -82,7 +76,7 @@ export function useAuth() {
 
   const logout = async () => {
     try {
-      await supabase.auth.signOut();
+      await signOut();
     } catch (error) {
       console.error('Error signing out:', error);
     }

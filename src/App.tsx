@@ -11,7 +11,6 @@ import ProgramsPage from './pages/Programs';
 import BlogPostPage from './pages/BlogPost';
 import ProgramDetailPage from './pages/ProgramDetail';
 import ProjectDetailPage from './pages/ProjectDetail';
-import ThemeToggle from './components/ThemeToggle';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -43,12 +42,7 @@ function AppContent() {
           <Route path="/admin/*" element={<AdminPanel />} />
         </Routes>
       </div>
-      {!isAdmin && (
-        <>
-          <Footer />
-          <ThemeToggle />
-        </>
-      )}
+      {!isAdmin && <Footer />}
     </div>
   );
 }
