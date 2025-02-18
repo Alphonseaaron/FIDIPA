@@ -7,7 +7,6 @@ const blogPosts = {
   'empowering-communities-through-sustainable-development': {
     title: "Empowering Communities Through Sustainable Development",
     description: "Our sustainable development initiatives are transforming rural communities...",
-    imageUrl: "/image/DSC05379.JPG",
     content: `Our sustainable development initiatives are transforming rural communities through innovative approaches to poverty alleviation, environmental conservation, and economic empowerment. By implementing participatory development strategies and building local capacity, we're creating lasting positive change that benefits entire communities.
 
     Program Components:
@@ -100,7 +99,7 @@ const blogPosts = {
     Through these comprehensive efforts, we're building resilient communities that can sustainably manage their resources and continue developing long after our initial intervention.`,
     author: "Jayne Wasonga",
     date: "2024-02-15",
-    imageUrl: "/src/assets/images/DSC05379.JPG"
+    imageUrl: "/image/DSC05379.JPG"
   },
   'the-impact-of-gender-equality-programs': {
     title: "The Impact of Gender Equality Programs",
@@ -219,7 +218,7 @@ const blogPosts = {
       - Impact measurement`,
     author: "Jayne Wasonga",
     date: "2024-02-10",
-    imageUrl: "/src/assets/images/SAM_0790.JPG"
+    imageUrl: "/image/SAM_0790.JPG"
   },
   'innovation-in-rural-healthcare-delivery': {
     title: "Innovation in Rural Healthcare Delivery",
@@ -338,7 +337,7 @@ const blogPosts = {
       - Research initiatives`,
     author: "Jayne Wasonga",
     date: "2024-02-05",
-    imageUrl: "/src/assets/images/IMG_20141007_172002.jpg"
+    imageUrl: "/image/IMG_20141007_172002.jpg"
   }
 };
 
