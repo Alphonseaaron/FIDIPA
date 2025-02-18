@@ -141,7 +141,7 @@ export interface Database {
           title: string
           content: string | null
           image_url: string | null
-          order: number | null
+          sort_order: number | null
           updated_at: string
         }
         Insert: {
@@ -149,7 +149,7 @@ export interface Database {
           title: string
           content?: string | null
           image_url?: string | null
-          order?: number | null
+          sort_order?: number | null
           updated_at?: string
         }
         Update: {
@@ -157,7 +157,7 @@ export interface Database {
           title?: string
           content?: string | null
           image_url?: string | null
-          order?: number | null
+          sort_order?: number | null
           updated_at?: string
         }
       }
@@ -170,6 +170,7 @@ export interface Database {
           logo_url: string | null
           favicon_url: string | null
           social_links: Json
+          sections: Json
           updated_at: string
         }
         Insert: {
@@ -180,6 +181,7 @@ export interface Database {
           logo_url?: string | null
           favicon_url?: string | null
           social_links?: Json
+          sections?: Json
           updated_at?: string
         }
         Update: {
@@ -190,9 +192,20 @@ export interface Database {
           logo_url?: string | null
           favicon_url?: string | null
           social_links?: Json
+          sections?: Json
           updated_at?: string
         }
       }
     }
   }
 }
+
+export const defaultSections = {
+  home: true,
+  about: true,
+  programs: true,
+  projects: true,
+  team: true,
+  blog: true,
+  contact: true
+} as const;

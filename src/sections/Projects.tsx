@@ -1,29 +1,74 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { supabase } from '../lib/supabase';
+import type { Database } from '../lib/database.types';
 
-const projects = [
-  {
-    title: "Community Training Initiative",
-    description: "Implementing comprehensive training programs and workshops to build capacity within communities.",
-    imageUrl: "/image/DSC01363.JPG",
-    status: "Ongoing"
-  },
-  {
-    title: "Youth Development Program",
-    description: "Supporting youth through education and outdoor activities to build life skills and community engagement.",
-    imageUrl: "/image/SAM_0721.JPG",
-    status: "Ongoing"
-  },
-  {
-    title: "School Infrastructure Support",
-    description: "Improving school facilities and infrastructure to enhance the learning environment for students.",
-    imageUrl: "/image/SAM_0724.JPG",
-    status: "Ongoing"
-  }
-];
+type Project = Database['public']['Tables']['projects']['Row'];
 
 export default function Projects() {
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchProjects();
+
+    const channel = supabase
+      .channel('projects-changes')
+      .on('postgres_changes', 
+        { event: '*', schema: 'public', table: 'projects' },
+        () => {
+          fetchProjects();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  const fetchProjects = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('projects')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(3);
+
+      if (error) throw error;
+      setProjects(data || []);
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <section id="projects" className="py-20 bg-white dark:bg-dark-lighter">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="animate-pulse space-y-8">
+            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
+            <div className="grid md:grid-cols-3 gap-8">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="bg-white dark:bg-dark rounded-lg overflow-hidden">
+                  <div className="h-48 bg-gray-200 dark:bg-gray-700"></div>
+                  <div className="p-6 space-y-4">
+                    <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-2/3"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section id="projects" className="py-20 bg-white dark:bg-dark-lighter">
       <div className="max-w-7xl mx-auto px-4">
@@ -50,7 +95,7 @@ export default function Projects() {
         <div className="grid md:grid-cols-3 gap-8">
           {projects.map((project, index) => (
             <motion.div
-              key={project.title}
+              key={project.id}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               whileHover={{ y: -8 }}
@@ -60,19 +105,19 @@ export default function Projects() {
             >
               <div className="relative h-48 overflow-hidden">
                 <img 
-                  src={project.imageUrl} 
+                  src={project.image_url || 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&q=80&w=1600'} 
                   alt={project.title}
                   className="w-full h-full object-cover transition-transform group-hover:scale-110"
                 />
                 <div className="absolute top-4 right-4 bg-primary px-3 py-1 rounded-full text-sm font-medium text-white">
-                  {project.status}
+                  {project.status || 'Ongoing'}
                 </div>
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">{project.title}</h3>
                 <p className="text-gray-600 dark:text-gray-300 mb-4">{project.description}</p>
                 <Link 
-                  to={`/projects/${project.title.toLowerCase().replace(/\s+/g, '-')}`}
+                  to={`/projects/${project.slug}`}
                   className="text-primary hover:text-primary/80 transition-colors flex items-center"
                 >
                   Learn More 

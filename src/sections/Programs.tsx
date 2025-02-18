@@ -1,45 +1,78 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { supabase } from '../lib/supabase';
+import type { Database } from '../lib/database.types';
 
-const programs = [
-  {
-    title: "Gender Equality and Social Inclusion",
-    description: "Empowering communities to address gender inequality and social inclusion through training community paralegals, youth, and women as community resource persons.",
-    image: "/image/DSC05379.JPG",
-    subPrograms: [
-      "Women with Disability (WWD)",
-      "Women in and out of prisons",
-      "Young Widows Support",
-      "Girls Education and Mentorship",
-      "Women in Leadership"
-    ]
-  },
-  {
-    title: "Grandmothers and Orphans Support",
-    description: "Supporting grandmothers caring for orphans and vulnerable children (OVC) through health, nutrition, and economic empowerment initiatives.",
-    image: "/image/SAM_1418.JPG",
-    subPrograms: [
-      "Health Support",
-      "Nutrition Programs",
-      "Economic Empowerment",
-      "Education Support"
-    ]
-  },
-  {
-    title: "Environment and Food Security",
-    description: "Implementing sustainable farming methods and conservation agriculture to increase yields and promote drought-resistant crops.",
-    image: "/image/kamulu dalawa 028.jpg",
-    subPrograms: [
-      "Sustainable Land Management",
-      "Income Generation",
-      "Natural Resource Management",
-      "Climate Resilience"
-    ]
-  }
-];
+type Program = Database['public']['Tables']['programs']['Row'];
 
 export default function Programs() {
+  const [programs, setPrograms] = useState<Program[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchPrograms();
+
+    const channel = supabase
+      .channel('programs-changes')
+      .on('postgres_changes', 
+        { event: '*', schema: 'public', table: 'programs' },
+        () => {
+          fetchPrograms();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  const fetchPrograms = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('programs')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(3);
+
+      if (error) throw error;
+      setPrograms(data || []);
+    } catch (error) {
+      console.error('Error fetching programs:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <section id="programs" className="py-20 relative bg-light dark:bg-dark">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="animate-pulse space-y-8">
+            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
+            <div className="grid md:grid-cols-3 gap-8">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="bg-white dark:bg-dark-lighter rounded-lg overflow-hidden">
+                  <div className="h-48 bg-gray-200 dark:bg-gray-700"></div>
+                  <div className="p-6 space-y-4">
+                    <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
+                    <div className="space-y-2">
+                      {[1, 2, 3].map((j) => (
+                        <div key={j} className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-2/3"></div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section id="programs" className="py-20 relative bg-light dark:bg-dark">
       <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&q=80&w=1600')] bg-fixed bg-cover bg-center opacity-50 dark:opacity-40" />
@@ -67,9 +100,9 @@ export default function Programs() {
         </div>
         
         <div className="grid md:grid-cols-3 gap-8">
-          {programs.slice(0, 3).map((program, index) => (
+          {programs.map((program, index) => (
             <motion.div
-              key={program.title}
+              key={program.id}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               whileHover={{ y: -8 }}
@@ -79,7 +112,7 @@ export default function Programs() {
             >
               <div className="h-48 overflow-hidden">
                 <img 
-                  src={program.image} 
+                  src={program.image_url || 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&q=80&w=1600'} 
                   alt={program.title}
                   className="w-full h-full object-cover transition-transform group-hover:scale-110"
                 />
@@ -87,19 +120,28 @@ export default function Programs() {
               <div className="p-6">
                 <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">{program.title}</h3>
                 <p className="text-gray-600 dark:text-gray-300 mb-4">{program.description}</p>
-                <div className="mb-4">
-                  <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-400 mb-2">Key Components:</h4>
-                  <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-                    {program.subPrograms.slice(0, 3).map((sub, idx) => (
-                      <li key={idx} className="flex items-center">
-                        <span className="w-1.5 h-1.5 bg-primary rounded-full mr-2"></span>
-                        {sub}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                {program.content && (
+                  <div className="mb-4">
+                    <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-400 mb-2">Key Components:</h4>
+                    <div 
+                      className="text-sm text-gray-600 dark:text-gray-400 space-y-1"
+                      dangerouslySetInnerHTML={{ 
+                        __html: program.content
+                          .split('\n')
+                          .slice(0, 3)
+                          .map(line => `
+                            <div class="flex items-center">
+                              <span class="w-1.5 h-1.5 bg-primary rounded-full mr-2"></span>
+                              ${line}
+                            </div>
+                          `)
+                          .join('')
+                      }}
+                    />
+                  </div>
+                )}
                 <Link 
-                  to={`/programs/${program.title.toLowerCase().replace(/\s+/g, '-')}`}
+                  to={`/programs/${program.slug}`}
                   className="text-primary hover:text-primary/80 transition-colors flex items-center"
                 >
                   Learn More 
