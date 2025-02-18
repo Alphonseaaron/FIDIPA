@@ -2,14 +2,38 @@ import { createClient } from '@supabase/supabase-js';
 import { Database } from './database.types';
 import { nanoid } from 'nanoid';
 
+// Get environment variables
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
+// Validate environment variables
 if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
+  throw new Error('Missing Supabase environment variables. Please check your .env file.');
 }
 
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
+// Create Supabase client
+export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true
+  }
+});
+
+// Initialize Supabase connection
+const initializeSupabase = async () => {
+  try {
+    const { data, error } = await supabase.auth.getSession();
+    if (error) throw error;
+    console.log('Supabase initialized successfully');
+    return data.session;
+  } catch (error) {
+    console.error('Error initializing Supabase:', error);
+    throw error;
+  }
+};
+
+// Initialize on import
+initializeSupabase().catch(console.error);
 
 interface UploadResponse {
   url: string;
